@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "590956139711",
+    "firebase_url": "https://tecnicoalgar-c6ff0.firebaseio.com",
+    "project_id": "tecnicoalgar-c6ff0",
+    "storage_bucket": "tecnicoalgar-c6ff0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590956139711:android:0f535057a3568597",
+        "android_client_info": {
+          "package_name": "lit26.tecnicoalgarapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "590956139711-0ci4mck9s1b0e1u77g8tl3a3cusnlj8u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCULTV3tRKFRJHNkDrJf1JY8ObGGbnCmD4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

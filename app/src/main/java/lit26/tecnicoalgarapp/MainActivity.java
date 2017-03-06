@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.identity.intents.Address;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,25 +30,29 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.LogRecord;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
     private GoogleMap mMap;
-    private Dialog dialog;
-    private Button buttonCriar;
-    private Button buttonCancelar;
-    private EditText editTextRua;
-    private EditText editTextNumero;
-    private EditText editTextBairro;
-    private EditText editTextCidade;
-    private EditText editTextCEP;
-    private List<android.location.Address> addresses;
+
     private FrameLayout container;
+    private List<Demand> demandas;
+    private int atual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,17 +61,33 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        atual = 0;
+        carregarDemandas();
 
         container = (FrameLayout) findViewById(R.id.mainContainer);
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+                Demand prox = proximaDemanda();
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(prox.getLatitude(), prox.getLongitude())));
+                Call<JsonObject> callGet = ArtecApplication.getApi().notificaProximo(prox.getCliente_id());
+                callGet.enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, "Entrando em contato com o próximo cliente", Toast.LENGTH_SHORT).show();
+                            //Snackbar.make(view, "Entrando em contato com o próximo cliente", Snackbar.LENGTH_LONG)
+                            //       .setAction("Action", null).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
             }
         });
 
@@ -83,19 +104,13 @@ public class MainActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+    }
 
-    /*
-        dialog = new Dialog(this);
-        dialog.setContentView(view);
+    @Override
+    public void onResume() {
+        super.onResume();
 
-        buttonCriar = (Button) dialog.findViewById(R.id.buttonCriar);
-        buttonCancelar = (Button) dialog.findViewById(R.id.buttonCancelar);
-        editTextRua = (EditText) dialog.findViewById(R.id.editTextRua);
-        editTextNumero = (EditText) dialog.findViewById(R.id.editTextNumero);
-        editTextBairro = (EditText) dialog.findViewById(R.id.editTextBairro);
-        editTextCidade = (EditText) dialog.findViewById(R.id.editTextCidade);
-        editTextCEP = (EditText) dialog.findViewById(R.id.editTextCEP);
-        */
+
     }
 
     @Override
@@ -138,23 +153,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             container.setVisibility(View.GONE);
-
-
-
+            carregarDemandas();
         } else if (id == R.id.nav_gallery) {
             container.setVisibility(View.VISIBLE);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, new FormularioFragment())
             .commit();
-
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -167,11 +170,47 @@ public class MainActivity extends AppCompatActivity
         mMap = googleMap;
 
         // Add a marker in Sydney and move the came
-        LatLng sydney = new LatLng(-18.8928653, -48.2580048);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Algar Telecom"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f));
+        LatLng centro = new LatLng(-18.910549447195713, -48.2623815536499);
+        //mMap.addMarker(new MarkerOptions().position(sydney).title("Algar Telecom"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(centro));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
 
+    }
+
+    public Demand proximaDemanda() {
+        atual += (atual + 1) % demandas.size();
+        if (demandas.get(0) == null) {
+            atual += (atual + 1) % demandas.size();
+        }
+        return demandas.get(atual);
+    }
+
+    public void carregarDemandas() {
+        Call<List<Demand>> getCall = ArtecApplication.getApi().getDemands();
+        getCall.enqueue(new Callback<List<Demand>>() {
+            @Override
+            public void onResponse(Call<List<Demand>> call, Response<List<Demand>> response) {
+                if (response.isSuccessful()) {
+                    Log.i("HEADER", response.headers().toString());
+                    Log.i("BODY", response.body().toString());
+
+                    demandas = response.body();
+                    mMap.clear();
+                    for (Demand d : response.body()) {
+                        if (d != null)  {
+                            Log.i("Demanda: ", d.toString());
+                            LatLng l = new LatLng(d.getLatitude(), d.getLongitude());
+                            mMap.addMarker(new MarkerOptions().position(l).title(d.getDescricao()));
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Demand>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
 }
