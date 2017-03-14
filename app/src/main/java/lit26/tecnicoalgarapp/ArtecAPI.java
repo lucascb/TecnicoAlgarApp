@@ -27,5 +27,5 @@ public interface ArtecAPI {
     Call<JsonObject> postDemand(@Body Demand demand);
 
     @GET("notificaCliente")
-    Call<JsonObject> notificaProximo(@Query("id") int userId);
+    Call<JsonObject> notifyNext(@Query("id") int userId);
 }

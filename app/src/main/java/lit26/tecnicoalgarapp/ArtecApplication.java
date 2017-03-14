@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ArtecApplication {
     private static Retrofit retrofit = null;
     private static ArtecAPI api = null;
-    private static final String serverUrl = "http://10.13.32.23:8080/Hackathon/";
+    private static final String serverUrl = "http://10.13.32.214:8080/artec/";
 
     public static ArtecAPI getApi() {
         if (retrofit == null) {

@@ -40,7 +40,7 @@ public class FormularioFragment extends Fragment {
     private EditText editTextBairro;
     private EditText editTextCidade;
 
-    public View onCreateView (LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
         View view = layoutInflater.inflate(R.layout.fragment_formulario, viewGroup, false);
 
         buttonCriar = (Button) view.findViewById(R.id.buttonCriar);

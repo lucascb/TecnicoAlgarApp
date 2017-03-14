@@ -49,7 +49,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
     private GoogleMap mMap;
-
     private FrameLayout container;
     private List<Demand> demandas;
     private int atual;
@@ -70,16 +69,16 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                Snackbar.make(view, "Entrando em contato com o próximo cliente", Snackbar.LENGTH_LONG).show();
                 Demand prox = proximaDemanda();
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(prox.getLatitude(), prox.getLongitude())));
-                Call<JsonObject> callGet = ArtecApplication.getApi().notificaProximo(prox.getCliente_id());
+                Call<JsonObject> callGet = ArtecApplication.getApi().notifyNext(prox.getCliente_id());
                 callGet.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "Entrando em contato com o próximo cliente", Toast.LENGTH_SHORT).show();
-                            //Snackbar.make(view, "Entrando em contato com o próximo cliente", Snackbar.LENGTH_LONG)
-                            //       .setAction("Action", null).show();
+                            //Toast.makeText(MainActivity.this, "Entrando em contato com o próximo cliente", Toast.LENGTH_SHORT).show();
+                            Log.i("TESTE", "Deu certo");
                         }
                     }
 
@@ -109,8 +108,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-
-
     }
 
     @Override
