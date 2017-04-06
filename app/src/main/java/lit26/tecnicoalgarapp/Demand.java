@@ -5,44 +5,45 @@ package lit26.tecnicoalgarapp;
  */
 
 public class Demand {
-    private int id;
-    private int cliente_id;
-    private int tecnico_id;
+    private long id;
+    private Pessoa cliente;
+    private Pessoa tecnico;
     private String descricao;
     private double latitude;
     private double longitude;
+    private boolean done = false;
 
-    public Demand(int cliente_id, int tecnico_id, String descricao,
-                  double latitude, double longitude) {
-        this.cliente_id = cliente_id;
-        this.tecnico_id = tecnico_id;
+    public Demand(Pessoa cliente, Pessoa tecnico, String descricao, double latitude,
+                  double longitude) {
+        this.cliente = cliente;
+        this.tecnico = tecnico;
         this.descricao = descricao;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public int getCliente_id() {
-        return cliente_id;
+    public Pessoa getCliente() {
+        return cliente;
     }
 
-    public void setCliente_id(int cliente_id) {
-        this.cliente_id = cliente_id;
+    public void setCliente(Pessoa cliente) {
+        this.cliente = cliente;
     }
 
-    public int getTecnico_id() {
-        return tecnico_id;
+    public Pessoa getTecnico() {
+        return tecnico;
     }
 
-    public void setTecnico_id(int tecnico_id) {
-        this.tecnico_id = tecnico_id;
+    public void setTecnico(Pessoa tecnico) {
+        this.tecnico = tecnico;
     }
 
     public String getDescricao() {
@@ -69,14 +70,24 @@ public class Demand {
         this.longitude = longitude;
     }
 
+    public void finish() {
+        this.done = true;
+    }
+
+    public boolean isFinished() {
+        return this.done;
+    }
+
     @Override
     public String toString() {
         return "Demand{" +
-                "cliente_id=" + cliente_id +
-                ", tecnico_id=" + tecnico_id +
+                "id=" + id +
+                ", cliente=" + cliente +
+                ", tecnico=" + tecnico +
                 ", descricao='" + descricao + '\'' +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
+                ", done=" + done +
                 '}';
     }
 }

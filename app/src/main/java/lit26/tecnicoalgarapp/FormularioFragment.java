@@ -39,6 +39,8 @@ public class FormularioFragment extends Fragment {
     private EditText editTextNumero;
     private EditText editTextBairro;
     private EditText editTextCidade;
+    private Pessoa cliente = new Pessoa(3, "Lucas", "219812", "lucas@algartelecom", "foto.png");
+    private Pessoa tecnico = new Pessoa(2, "Leandro", "91821", "leandro@algartelecom", "foto.png");
 
     public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
         View view = layoutInflater.inflate(R.layout.fragment_formulario, viewGroup, false);
@@ -57,7 +59,8 @@ public class FormularioFragment extends Fragment {
                     " " + editTextNumero.getText().toString() + " " + editTextCidade.getText().toString());
                 Log.i("TESTE", location.latitude + " " + location.longitude);
 
-                Demand demand = new Demand(4, 1, "Lucas", location.latitude, location.longitude);
+
+                Demand demand = new Demand(cliente, tecnico, "TESTE", location.latitude, location.longitude);
                 Call<JsonObject> callPost = ArtecApplication.getApi().postDemand(demand);
                 callPost.enqueue(new Callback<JsonObject>() {
                     @Override

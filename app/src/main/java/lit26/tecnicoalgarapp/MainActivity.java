@@ -28,6 +28,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
@@ -71,8 +72,9 @@ public class MainActivity extends AppCompatActivity
             public void onClick(final View view) {
                 Snackbar.make(view, "Entrando em contato com o próximo cliente", Snackbar.LENGTH_LONG).show();
                 Demand prox = proximaDemanda();
+                carregarMarcas();
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(prox.getLatitude(), prox.getLongitude())));
-                Call<JsonObject> callGet = ArtecApplication.getApi().notifyNext(prox.getCliente_id());
+                Call<JsonObject> callGet = ArtecApplication.getApi().notifyNext(prox.getCliente().getId());
                 callGet.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -175,10 +177,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     public Demand proximaDemanda() {
+        Demand d = demandas.get(atual);
+        d.finish();
+        demandas.add(atual, d);
+
         atual += (atual + 1) % demandas.size();
         if (demandas.get(0) == null) {
             atual += (atual + 1) % demandas.size();
         }
+
         return demandas.get(atual);
     }
 
@@ -192,14 +199,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i("BODY", response.body().toString());
 
                     demandas = response.body();
-                    mMap.clear();
-                    for (Demand d : response.body()) {
-                        if (d != null)  {
-                            Log.i("Demanda: ", d.toString());
-                            LatLng l = new LatLng(d.getLatitude(), d.getLongitude());
-                            mMap.addMarker(new MarkerOptions().position(l).title(d.getDescricao()));
-                        }
-                    }
+                    carregarMarcas();
                 }
             }
 
@@ -208,6 +208,17 @@ public class MainActivity extends AppCompatActivity
                 t.printStackTrace();
             }
         });
+    }
+
+    public void carregarMarcas() {
+        mMap.clear();
+        for (Demand d : demandas) {
+            Log.i("Demanda: ", d.toString());
+            if (d != null && !d.isFinished()) {
+                LatLng l = new LatLng(d.getLatitude(), d.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(l).title(d.getDescricao()));
+            }
+        }
     }
 
 }

@@ -20,12 +20,12 @@ import retrofit2.http.Query;
  */
 
 public interface ArtecAPI {
-    @GET("demandas")
+    @GET("obtemDemandas")
     Call<List<Demand>> getDemands();
 
     @POST("criaDemanda")
     Call<JsonObject> postDemand(@Body Demand demand);
 
     @GET("notificaCliente")
-    Call<JsonObject> notifyNext(@Query("id") int userId);
+    Call<JsonObject> notifyNext(@Query("id") long userId);
 }
